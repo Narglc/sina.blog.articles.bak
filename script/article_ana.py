@@ -1,10 +1,11 @@
 from bs4 import BeautifulSoup
+from utils import getCurClassPage
 
 article_template = '''
 <h2>{title}</h2>
 
 <span class="time SG_txtc">时间: {time} | 分类: [{blogClass}]({classUrl}) | 标签: {tags}</span>
-
+<!--
 <table>
     <tbody>
         <tr>
@@ -14,6 +15,7 @@ article_template = '''
         </tr>
     </tbody>
 </table>
+-->
 {content}
 '''
 
@@ -41,8 +43,7 @@ class SinaArticleAna:
         titlePart = soup.find("div",{'class': 'articalTitle'})
 
         # 标题
-        self.title_html = titlePart.find("h2",{'class': 'titName'})
-        self.title = str(self.title_html.getText())
+        self.title = str(titlePart.find("h2",{'class': 'titName'}).getText())
 
         # 具体时间、日期
         self.time = titlePart.find("span",{'class': 'time'}).getText()[1:-1]
@@ -60,10 +61,8 @@ class SinaArticleAna:
         # 分类
         self.blogClass = tagPart.find("td",{"class":"blog_class"}).find("a").getText()
 
-
-
     def convMd(self):
-        self.content = article_template.format(title=self.title,time=self.time,blogClass=self.blogClass, tags= ",".join(self.blogTags),content=self.body_str,classUrl = "./demo.md")
+        self.content = article_template.format(title=self.title,time=self.time,blogClass=self.blogClass, tags= ",".join(self.blogTags),content=self.body_str,classUrl = getCurClassPage(self.blogClass))
 
     def write2file(self):
         with open("./articles/{}_{}.md".format(self.date, self.title), "w+") as fd:
@@ -74,4 +73,5 @@ class SinaArticleAna:
         if self.hasImg:
             print("has img")
 
-        
+    def getClassInfo(self):
+        return self.blogClass, "{}_{}".format(self.date, self.title)

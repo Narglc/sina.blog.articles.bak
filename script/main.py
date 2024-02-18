@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from article_ana import SinaArticleAna
+from catalog_summary import SinaCatalogSummary
 # from urllib.parse import unquote
 
 
@@ -66,8 +67,15 @@ def getCookies():
 
 # 测试
 if __name__ == "__main__":
+    cataSummary = SinaCatalogSummary()
+
     with open("articles/origin.html","r+") as fd:
         # 处理文章
-        ana = SinaArticleAna(fd)
-        ana.handle()
+        articleAna = SinaArticleAna(fd)
+        articleAna.handle()
+        bClass, bTitle = articleAna.getClassInfo()
+        cataSummary.append(bClass,bTitle)
         print("got here...")
+
+    # 生成分类页面
+    cataSummary.summary()
