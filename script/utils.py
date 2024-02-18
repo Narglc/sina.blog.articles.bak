@@ -1,4 +1,5 @@
 
+
 # 分类页面也使用md
 class_page = "./BlogClass_{}.md"
 

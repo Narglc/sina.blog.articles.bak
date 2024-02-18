@@ -71,6 +71,7 @@ class SinaArticleAna:
 
     def downloadImg(self):
         if self.hasImg:
+            # TODO
             print("has img")
 
     def getClassInfo(self):
