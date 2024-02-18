@@ -44,30 +44,30 @@ def getCookies():
     return cookies
 
 # # 测试代码
-if __name__ == "__main__":
-    # 替换为你要爬取的新浪博客文章链接
-    article_url = "https://blog.sina.com.cn/s/blog_497675f20100an52.html"
+# if __name__ == "__main__":
+#     # 替换为你要爬取的新浪博客文章链接
+#     article_url = "https://blog.sina.com.cn/s/blog_497675f20100an52.html"
     
-    # 替换为你的Cookie字典，如果没有Cookie则为None
-    cookies = getCookies()
-    headers = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, sdch, br",
-        "Accept-Language": "zh-CN,zh;q=0.8",
-        "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
-        "Host": "blog.sina.com.cn",
-        "Accept":"*/*"
-    }
+#     # 替换为你的Cookie字典，如果没有Cookie则为None
+#     cookies = getCookies()
+#     headers = {
+#         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+#         "Accept-Encoding": "gzip, deflate, sdch, br",
+#         "Accept-Language": "zh-CN,zh;q=0.8",
+#         "User-Agent": "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
+#         "Host": "blog.sina.com.cn",
+#         "Accept":"*/*"
+#     }
     
-    article_content = get_article_content(article_url, cookies, headers)
+#     article_content = get_article_content(article_url, cookies, headers)
     
-    if article_content:
-        print(article_content)
+#     if article_content:
+#         print(article_content)
 
 # 测试
-# if __name__ == "__main__":
-#     with open("articles/origin.html","r+") as fd:
-#         # 处理文章
-#         ana = SinaArticleAna(fd)
-#         ana.handle()
-#         print("got here...")
+if __name__ == "__main__":
+    with open("articles/origin.html","r+") as fd:
+        # 处理文章
+        ana = SinaArticleAna(fd)
+        ana.handle()
+        print("got here...")
