@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from utils import getCurClassPage
+from download import getBlogPage, downloadImg, getImgReqHeader
 
 article_template = '''
 <h2>{title}</h2>
@@ -20,17 +21,31 @@ article_template = '''
 '''
 
 class SinaArticleAna:
-    def __init__(self, pageContent):
-        self.pageContent = pageContent
+    def __init__(self, atcUrl, cookies,header):
+        self.articleUrl = atcUrl
+        self.cookies = cookies
+        self.header = header
+        self.hasImg = False
+        self.isAvaiable = False
     
     def handle(self):
+        self.getAtcPage()
         self.simplify()
-        self.convMd()
         self.downloadImg()
+        self.convMd()
         self.write2file()
 
 
+    def getAtcPage(self):
+        pageContent = getBlogPage(self.articleUrl, self.cookies, self.header)
+        if pageContent:
+            self.pageContent = pageContent
+            self.isAvaiable = True
+
     def simplify(self):
+        if self.isAvaiable is False:
+            return
+
         # 解析HTML
         soup = BeautifulSoup(self.pageContent, 'html.parser')  # 注意这里使用了 response.text
         
@@ -58,21 +73,49 @@ class SinaArticleAna:
         blogTag = tagPart.find("td",{"class":"blog_tag"})
         self.blogTags = [one.getText() for one in blogTag.find_all("h3")]
 
-        # 分类
-        self.blogClass = tagPart.find("td",{"class":"blog_class"}).find("a").getText()
+        # 分类: 有些文章会有多个分类？ 只选取第一个分类？
+        blogClassBlk = tagPart.find("td",{"class":"blog_class"}).find("a")
+        if blogClassBlk is None: 
+            self.blogClass = "未分类博文"
+        else:
+            self.blogClass = blogClassBlk.getText()
 
     def convMd(self):
+        if self.isAvaiable is False:
+            return
         self.content = article_template.format(title=self.title,time=self.time,blogClass=self.blogClass, tags= ",".join(self.blogTags),content=self.body_str,classUrl = getCurClassPage(self.blogClass))
 
     def write2file(self):
+        if self.isAvaiable is False:
+            return
         with open("./articles/{}_{}.md".format(self.date, self.title), "w+") as fd:
             fd.write(self.content)
-        print("write to md done.")
+        print("write {}_{} to md done.".format(self.date, self.title))
 
     def downloadImg(self):
         if self.hasImg:
-            # TODO
-            print("has img")
+            soup = BeautifulSoup(self.body_str, 'html.parser')
+            allPara = soup.find_all("p")
+            for one in allPara:
+                imgBlk = one.find("img")
+                if imgBlk:
+                    alt = imgBlk.attrs["alt"]
+                    src = imgBlk.attrs["real_src"]
+                    title = imgBlk.attrs["title"]
+                    localSavePicPath = "./articles/pic/{}.jpeg".format(title)
+                    imgOriName = src.split("/")[-1]                    
+                    ok  = downloadImg(src,getImgReqHeader(imgOriName), localSavePicPath)
+                    print("downloadImg {},oriName:{},alt:{},title:{},src:{},".format("succ" if ok else"fail", imgOriName,alt,title,src))
+                    if ok:
+                        # 创建新的img标签
+                        localPicPathInMd = "./pic/{}.jpeg".format(title)
+                        new_img_tag = soup.new_tag('img', src=localPicPathInMd, alt=alt, title=title)
+                        # 将要替换的段落标签替换为新的段落标签
+                        one.find("a").replace_with(new_img_tag)
+            # 更新原始的 HTML 字符串
+            self.body_str = str(soup)
 
     def getClassInfo(self):
+        if self.isAvaiable is False:
+            return "",""
         return self.blogClass, "{}_{}".format(self.date, self.title)
