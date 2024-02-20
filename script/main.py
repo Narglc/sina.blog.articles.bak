@@ -5,6 +5,27 @@ from download import getCookies,getHeader
 import time
 # from urllib.parse import unquote
 
+
+def spiderArticleList(articlePageList,cataSummary):
+    # 记录失败的文章列表
+    failArticleUrls = []
+    for oneUrl in articlePageList:
+        try:
+            # 处理文章
+            articleUrl = "https:{}".format(oneUrl)
+            articleAna = SinaArticleAna(articleUrl, cookies, header)
+            articleAna.handle()
+            bClass, bTitle = articleAna.getClassInfo()
+            if bClass != "":
+                cataSummary.append(bClass,bTitle)
+        except Exception as e:
+            print("ArticleAna:{} fail, err:{}".format(oneUrl, e))
+            failArticleUrls.append(oneUrl)
+        # 减小风控
+        time.sleep(3)
+    
+    return failArticleUrls
+
 # # 测试代码
 if __name__ == "__main__":
     cataSummary = SinaCatalogSummary()
@@ -20,31 +41,18 @@ if __name__ == "__main__":
     header = getHeader()
 
     # 所有文章URL列表
-    articlePageList = ["//blog.sina.com.cn/s/blog_497675f2010009qe.html"]
+    articlePageList = [] #["//blog.sina.com.cn/s/blog_497675f20100e72o.html","//blog.sina.com.cn/s/blog_497675f20100897x.html"]
 
     for beginPage in all_kinds_blogs:        
         menuAna = SinaMenuAna(beginPage, cookies, header)
         cur_menu = menuAna.getAllArticlePage()
         articlePageList.extend(cur_menu)
 
-    # 记录失败的文章列表
-    failArticleUrls = []
-
-    for oneUrl in articlePageList:
-        try:
-            # 处理文章
-            articleUrl = "https:{}".format(oneUrl)
-            articleAna = SinaArticleAna(articleUrl, cookies, header)
-            articleAna.handle()
-            bClass, bTitle = articleAna.getClassInfo()
-            if bClass != "":
-                cataSummary.append(bClass,bTitle)
-        except Exception as e:
-            print("ArticleAna:{} fail, err:{}".format(oneUrl, e))
-            failArticleUrls = failArticleUrls.append(oneUrl)
-        # 减小风控
+    while len(articlePageList) != 0:
+        failArticleUrls = spiderArticleList(articlePageList,cataSummary)
+        print("spiderArticle fail:{}".format(failArticleUrls))
+        articlePageList = failArticleUrls
         time.sleep(5)
-
 
 
     # 生成分类页面

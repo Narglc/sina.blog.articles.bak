@@ -35,7 +35,6 @@ class SinaArticleAna:
         self.convMd()
         self.write2file()
 
-
     def getAtcPage(self):
         pageContent = getBlogPage(self.articleUrl, self.cookies, self.header)
         if pageContent:
