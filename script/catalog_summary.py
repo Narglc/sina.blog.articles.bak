@@ -3,13 +3,14 @@ from utils import getCurClassPage
 
 class SinaCatalogSummary:
     def __init__(self):
+        # 改为存储到sqlite3
         self.blogClassDict = {}
-
     
     def append(self, bClass, bTitle):
+        
         if bClass not in self.blogClassDict:
             self.blogClassDict[bClass] = set()
-            
+
         self.blogClassDict[bClass].add(bTitle)
 
     def summary(self):

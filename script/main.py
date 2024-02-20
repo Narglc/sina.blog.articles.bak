@@ -43,9 +43,8 @@ if __name__ == "__main__":
     cookies = getCookies(cookies_str)
     header = getHeader()
 
-    # 所有文章URL列表
+    # 获取所有文章URL列表
     articlePageList = []
-
     for beginPage in all_kinds_blogs:
         if beginPage is None or beginPage == "":
             continue
@@ -53,6 +52,7 @@ if __name__ == "__main__":
         cur_menu = menuAna.getAllArticlePage()
         articlePageList.extend(cur_menu)
 
+    # 下载文章到本地
     while len(articlePageList) != 0:
         failArticleUrls = spiderArticleList(articlePageList,cataSummary)
         print("spiderArticle fail:{}".format(failArticleUrls))
