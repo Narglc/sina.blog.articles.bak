@@ -95,23 +95,22 @@ class SinaArticleAna:
     def downloadImg(self):
         if self.hasImg:
             soup = BeautifulSoup(self.body_str, 'html.parser')
-            allPara = soup.find_all("p")
-            for one in allPara:
-                imgBlk = one.find("img")
-                if imgBlk:
-                    alt = imgBlk.attrs["alt"]
-                    src = imgBlk.attrs["real_src"]
-                    title = imgBlk.attrs["title"]
-                    localSavePicPath = "./articles/pic/{}.jpeg".format(title)
-                    imgOriName = src.split("/")[-1]                    
-                    ok  = downloadImg(src,getImgReqHeader(imgOriName), localSavePicPath)
-                    print("downloadImg {},oriName:{},alt:{},title:{},src:{},".format("succ" if ok else"fail", imgOriName,alt,title,src))
-                    if ok:
-                        # 创建新的img标签
-                        localPicPathInMd = "./pic/{}.jpeg".format(title)
-                        new_img_tag = soup.new_tag('img', src=localPicPathInMd, alt=alt, title=title)
-                        # 将要替换的段落标签替换为新的段落标签
-                        one.find("a").replace_with(new_img_tag)
+            allImgs = soup.find_all("img")
+            for imgBlk in allImgs:
+                alt = imgBlk.attrs["alt"]
+                src = imgBlk.attrs["real_src"]
+                title = imgBlk.attrs["title"]
+                imgOriName = src.split("/")[-1]  
+                picName = "{}_{}".format(title, imgOriName)
+                localSavePicPath = "./articles/pic/{}".format(picName)                 
+                postfix, ok  = downloadImg(src,getImgReqHeader(imgOriName), localSavePicPath)
+                print("downloadImg {},oriName:{},alt:{},title:{},src:{},".format("succ" if ok else"fail", imgOriName,alt,title,src))
+                if ok:
+                    # 创建新的img标签
+                    localPicPathInMd = "./pic/{}{}".format(picName, postfix)
+                    new_img_tag = soup.new_tag('img', src=localPicPathInMd, alt=alt, title=title)
+                    # 将要替换的段落标签替换为新的段落标签
+                    imgBlk.replace_with(new_img_tag)
             # 更新原始的 HTML 字符串
             self.body_str = str(soup)
 

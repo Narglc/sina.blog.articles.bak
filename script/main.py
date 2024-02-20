@@ -20,12 +20,12 @@ if __name__ == "__main__":
     header = getHeader()
 
     # 所有文章URL列表
-    articlePageList = []
+    articlePageList = ["//blog.sina.com.cn/s/blog_497675f2010009qe.html"]
 
-    for beginPage in all_kinds_blogs:        
-        menuAna = SinaMenuAna(beginPage, cookies, header)
-        cur_menu = menuAna.getAllArticlePage()
-        articlePageList.extend(cur_menu)
+    # for beginPage in all_kinds_blogs:        
+    #     menuAna = SinaMenuAna(beginPage, cookies, header)
+    #     cur_menu = menuAna.getAllArticlePage()
+    #     articlePageList.extend(cur_menu)
 
     for oneUrl in articlePageList:
         try:

@@ -7,7 +7,7 @@
 
 
 # bug-fix
-- [ ] 同一片文章多张图片会有问题
+- [x] 同一片文章多张图片会有问题(20240220)
 
 ```python
 urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1002)
