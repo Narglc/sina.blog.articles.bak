@@ -2,6 +2,7 @@ from article_ana import SinaArticleAna
 from menu_ana import SinaMenuAna
 from catalog_summary import SinaCatalogSummary
 from download import getCookies,getHeader
+from utils import readYamlConfig
 import time
 # from urllib.parse import unquote
 
@@ -30,14 +31,16 @@ def spiderArticleList(articlePageList,cataSummary):
 if __name__ == "__main__":
     cataSummary = SinaCatalogSummary()
 
-    # 博文目录下的“全部博文”页面
-    public_blogs = "https://blog.sina.com.cn/s/articlelist_1232500210_0_1.html"
+    # 读取 YAML 配置文件
+    config = readYamlConfig('./script/config/config.yaml')
 
-    # 博文目录下的“秘密博文”页面
-    private_blogs = "https://control.blog.sina.com.cn/blog_rebuild/blog/controllers/articlelist.php?uid=1232500210&p=1&status=5"
+    public_blogs = config["blogs"]["public_blogs_menu"]
+    private_blogs = config["blogs"]["private_blogs_menu"]
 
     all_kinds_blogs = [public_blogs, private_blogs]
-    cookies = getCookies()
+
+    cookies_str = config["blogs"]["cookies_str"]
+    cookies = getCookies(cookies_str)
     header = getHeader()
 
     # 所有文章URL列表
@@ -54,6 +57,7 @@ if __name__ == "__main__":
         articlePageList = failArticleUrls
         time.sleep(5)
 
-
     # 生成分类页面
     cataSummary.summary()
+
+    # 汇总 README.md

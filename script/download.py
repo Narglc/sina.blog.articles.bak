@@ -54,16 +54,14 @@ def getImgReqHeader(imgTitle):
     }
     return headers
 
-def getCookies():
+def getCookies(cookies_str):
     cookies = {}
-    with open("script/config/cookies.info","r+") as fd:
-        cookies_str = fd.read()
-        # 将Cookie字符串转换为字典
-        cookies_list = cookies_str.split("; ")
-        
-        for cookie in cookies_list:
-            key, value = cookie.split("=")
-            cookies[key] = value
+    # 将Cookie字符串转换为字典
+    cookies_list = cookies_str.split("; ")
+    
+    for cookie in cookies_list:
+        key, value = cookie.split("=")
+        cookies[key] = value
     return cookies
 
 def getHeader():
