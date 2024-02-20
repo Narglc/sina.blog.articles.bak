@@ -13,12 +13,18 @@ class SinaCatalogSummary:
         self.blogClassDict[bClass].add(bTitle)
 
     def summary(self):
-        # 生成分类汇总页面
+        rdfd = open("./README.md","a+")
+        rdfd.write("----\n")
+
+        # 生成分类汇总页面 并汇总 README.md
         for bClass, titleSet in self.blogClassDict.items():
             with open("./articles/{}".format(getCurClassPage(bClass)), "w+") as fd:
                 fd.write("## {}\n".format(bClass))
-                for title in titleSet:
+                rdfd.write("## {}\n".format(bClass))
+                # 按时间排序
+                titleList = sorted(titleSet)
+                for title in titleList:
                     fd.write("- [{}](./{}.md)\n".format(title,title))
+                    rdfd.write("- [{}](./articles/{}.md)\n".format(title,title))
 
-        # 重构 README.md
-        # TODO
+

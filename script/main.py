@@ -44,9 +44,11 @@ if __name__ == "__main__":
     header = getHeader()
 
     # 所有文章URL列表
-    articlePageList = [] #["//blog.sina.com.cn/s/blog_497675f20100e72o.html","//blog.sina.com.cn/s/blog_497675f20100897x.html"]
+    articlePageList = []
 
-    for beginPage in all_kinds_blogs:        
+    for beginPage in all_kinds_blogs:
+        if beginPage is None or beginPage == "":
+            continue
         menuAna = SinaMenuAna(beginPage, cookies, header)
         cur_menu = menuAna.getAllArticlePage()
         articlePageList.extend(cur_menu)
@@ -57,7 +59,5 @@ if __name__ == "__main__":
         articlePageList = failArticleUrls
         time.sleep(5)
 
-    # 生成分类页面
+    # 生成分类页面及汇总README.md
     cataSummary.summary()
-
-    # 汇总 README.md
