@@ -22,10 +22,13 @@ if __name__ == "__main__":
     # 所有文章URL列表
     articlePageList = ["//blog.sina.com.cn/s/blog_497675f2010009qe.html"]
 
-    # for beginPage in all_kinds_blogs:        
-    #     menuAna = SinaMenuAna(beginPage, cookies, header)
-    #     cur_menu = menuAna.getAllArticlePage()
-    #     articlePageList.extend(cur_menu)
+    for beginPage in all_kinds_blogs:        
+        menuAna = SinaMenuAna(beginPage, cookies, header)
+        cur_menu = menuAna.getAllArticlePage()
+        articlePageList.extend(cur_menu)
+
+    # 记录失败的文章列表
+    failArticleUrls = []
 
     for oneUrl in articlePageList:
         try:
@@ -38,8 +41,11 @@ if __name__ == "__main__":
                 cataSummary.append(bClass,bTitle)
         except Exception as e:
             print("ArticleAna:{} fail, err:{}".format(oneUrl, e))
+            failArticleUrls = failArticleUrls.append(oneUrl)
         # 减小风控
         time.sleep(5)
+
+
 
     # 生成分类页面
     cataSummary.summary()
