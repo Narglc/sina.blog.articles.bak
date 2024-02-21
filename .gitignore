@@ -162,4 +162,3 @@ cython_debug/
 # cur project
 *.html
 *.info
-sinaBlogArticles.db
