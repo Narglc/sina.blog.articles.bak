@@ -1,0 +1,11 @@
+blogs:
+  # 博文目录下的“全部博文”页面,不用可留空
+  public_blogs_menu: 
+  # 博文目录下的“秘密博文”页面
+  private_blogs_menu: https://control.blog.sina.com.cn/blog_rebuild/blog/controllers/articlelist.php?uid=1232500210&p=1&status=5
+  # 此处cookies仅供参考，请替换为你的cookies
+  cookies_str: name=sinaAds; post=massage; ... SINABLOGNUINFO=*; rotatecount=7
+
+# 此处简单使用sqlite3实现，降低依赖
+db:
+  fileName: sinaBlogArticles.db
