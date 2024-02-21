@@ -61,7 +61,7 @@ class SinaArticleAna:
 
         # 具体时间、日期
         self.time = titlePart.find("span",{'class': 'time'}).getText()[1:-1]
-        self.date = self.time.split(" ")[0]
+        self.date = self.time.replace(" ","_")
 
         # 正文是否包含图片需要下载
         self.hasImg = (titlePart.find("span",{"class":"img2"}) != None)
