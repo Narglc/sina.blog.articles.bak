@@ -21,10 +21,12 @@ article_template = '''
 '''
 
 class SinaArticleAna:
-    def __init__(self, atcUrl, cookies,header):
+    def __init__(self, atcUrl,article_id, cookies,header, db_mgr):
+        self.article_id = article_id
         self.articleUrl = atcUrl
         self.cookies = cookies
         self.header = header
+        self.dbMgr = db_mgr
         self.hasImg = False
         self.isAvaiable = False
     
@@ -34,6 +36,7 @@ class SinaArticleAna:
         self.downloadImg()
         self.convMd()
         self.write2file()
+        self.record2db()
 
     def getAtcPage(self):
         pageContent = getBlogPage(self.articleUrl, self.cookies, self.header)
@@ -70,7 +73,7 @@ class SinaArticleAna:
 
         # 标签
         blogTag = tagPart.find("td",{"class":"blog_tag"})
-        self.blogTags = [one.getText() for one in blogTag.find_all("h3")]
+        self.blogTags = ",".join([one.getText() for one in blogTag.find_all("h3")])
 
         # 分类: 有些文章会有多个分类？ 只选取第一个分类？
         blogClassBlk = tagPart.find("td",{"class":"blog_class"}).find("a")
@@ -79,10 +82,15 @@ class SinaArticleAna:
         else:
             self.blogClass = blogClassBlk.getText()
 
+    def record2db(self):
+        if self.isAvaiable:
+            type = self.dbMgr.getClassType(self.blogClass)
+            self.dbMgr.insertArticle(self.article_id,self.title,type,self.blogTags,self.hasImg,self.content,self.time)
+
     def convMd(self):
         if self.isAvaiable is False:
             return
-        self.content = article_template.format(title=self.title,time=self.time,blogClass=self.blogClass, tags= ",".join(self.blogTags),content=self.body_str,classUrl = getCurClassPage(self.blogClass))
+        self.content = article_template.format(title=self.title,time=self.time,blogClass=self.blogClass, tags= self.blogTags,content=self.body_str,classUrl = getCurClassPage(self.blogClass))
 
     def write2file(self):
         if self.isAvaiable is False:
@@ -112,8 +120,3 @@ class SinaArticleAna:
                     imgBlk.replace_with(new_img_tag)
             # 更新原始的 HTML 字符串
             self.body_str = str(soup)
-
-    def getClassInfo(self):
-        if self.isAvaiable is False:
-            return "",""
-        return self.blogClass, "{}_{}".format(self.date, self.title)

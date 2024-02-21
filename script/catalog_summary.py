@@ -1,30 +1,26 @@
 
 from utils import getCurClassPage
 
+# 改为存储到sqlite3
 class SinaCatalogSummary:
-    def __init__(self):
-        # 改为存储到sqlite3
-        self.blogClassDict = {}
-    
-    def append(self, bClass, bTitle):
-        
-        if bClass not in self.blogClassDict:
-            self.blogClassDict[bClass] = set()
-
-        self.blogClassDict[bClass].add(bTitle)
+    def __init__(self, mgr):
+        self.dbMgr = mgr
 
     def summary(self):
         rdfd = open("./README.md","a+")
         rdfd.write("----\n")
 
         # 生成分类汇总页面 并汇总 README.md
-        for bClass, titleSet in self.blogClassDict.items():
+        alltypes = self.dbMgr.getAllClassTypes()
+        for one in alltypes:
+            bClassId = one["id"]
+            bClass = one["type"]
             with open("./articles/{}".format(getCurClassPage(bClass)), "w+") as fd:
+                titleSet = self.dbMgr.getOneTypeArticlesList(bClassId)
                 fd.write("## {}\n".format(bClass))
                 rdfd.write("## {}\n".format(bClass))
-                # 按时间排序
-                titleList = sorted(titleSet)
-                for title in titleList:
+                for article in titleSet:
+                    title = "{}_{}".format(article["created_at"].replace(" ","_"),article["title"])
                     fd.write("- [{}](./{}.md)\n".format(title,title))
                     rdfd.write("- [{}](./articles/{}.md)\n".format(title,title))
 

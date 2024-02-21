@@ -4,21 +4,22 @@ from catalog_summary import SinaCatalogSummary
 from download import getCookies,getHeader
 from utils import readYamlConfig
 import time
-# from urllib.parse import unquote
+from dao import SQLiteManager
 
-
-def spiderArticleList(articlePageList,cataSummary):
+def spiderArticleList(articlePageList, db_mgr):
     # 记录失败的文章列表
     failArticleUrls = []
     for oneUrl in articlePageList:
         try:
             # 处理文章
             articleUrl = "https:{}".format(oneUrl)
-            articleAna = SinaArticleAna(articleUrl, cookies, header)
+            article_id = oneUrl.split('/')[-1].split('_')[-1].split('.')[0]
+            
+            # 已经拉群的文章跳过
+            if db_mgr.checkArticleExist(article_id):
+                continue
+            articleAna = SinaArticleAna(articleUrl, article_id, cookies, header, db_mgr)
             articleAna.handle()
-            bClass, bTitle = articleAna.getClassInfo()
-            if bClass != "":
-                cataSummary.append(bClass,bTitle)
         except Exception as e:
             print("ArticleAna:{} fail, err:{}".format(oneUrl, e))
             failArticleUrls.append(oneUrl)
@@ -29,8 +30,6 @@ def spiderArticleList(articlePageList,cataSummary):
 
 # # 测试代码
 if __name__ == "__main__":
-    cataSummary = SinaCatalogSummary()
-
     # 读取 YAML 配置文件
     config = readYamlConfig('./script/config/config.yaml')
 
@@ -43,6 +42,10 @@ if __name__ == "__main__":
     cookies = getCookies(cookies_str)
     header = getHeader()
 
+    dbfile = config["db"]["fileName"]
+    db_mgr = SQLiteManager(dbfile)
+    
+
     # 获取所有文章URL列表
     articlePageList = []
     for beginPage in all_kinds_blogs:
@@ -54,10 +57,11 @@ if __name__ == "__main__":
 
     # 下载文章到本地
     while len(articlePageList) != 0:
-        failArticleUrls = spiderArticleList(articlePageList,cataSummary)
+        failArticleUrls = spiderArticleList(articlePageList, db_mgr)
         print("spiderArticle fail:{}".format(failArticleUrls))
         articlePageList = failArticleUrls
         time.sleep(5)
 
     # 生成分类页面及汇总README.md
+    cataSummary = SinaCatalogSummary(db_mgr)
     cataSummary.summary()
